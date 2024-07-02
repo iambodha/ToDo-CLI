@@ -75,3 +75,74 @@ async function addTask() {
   await sleep(1000);
   spinner.success({ text: 'Task added!' });
 }
+
+function viewTasks() {
+  console.log('\n' + chalk.yellowBright('Your Tasks:\n'));
+  todoList.forEach((task, index) => {
+    console.log(
+      `${index + 1}. ${task.done ? chalk.strikethrough(task.task) : task.task}`
+    );
+  });
+  console.log('\n');
+}
+
+async function markTaskAsDone() {
+  const choices = todoList.map((task, index) => ({
+    name: task.task,
+    value: index
+  }));
+
+  if (choices.length === 0) {
+    console.log(chalk.red('No tasks to mark as done.'));
+    return;
+  }
+
+  const answer = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'taskIndex',
+      message: 'Select a task to mark as done:',
+      choices
+    }
+  ]);
+
+  todoList[answer.taskIndex].done = true;
+
+  const spinner = createSpinner('Marking task as done...').start();
+  await sleep(1000);
+  spinner.success({ text: 'Task marked as done!' });
+}
+
+async function deleteTask() {
+  const choices = todoList.map((task, index) => ({
+    name: task.task,
+    value: index
+  }));
+
+  if (choices.length === 0) {
+    console.log(chalk.red('No tasks to delete.'));
+    return;
+  }
+
+  const answer = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'taskIndex',
+      message: 'Select a task to delete:',
+      choices
+    }
+  ]);
+
+  todoList.splice(answer.taskIndex, 1);
+
+  const spinner = createSpinner('Deleting task...').start();
+  await sleep(1000);
+  spinner.success({ text: 'Task deleted!' });
+}
+
+async function start() {
+  await welcome();
+  await showMenu();
+}
+
+start();
